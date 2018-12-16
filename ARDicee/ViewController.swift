@@ -13,7 +13,9 @@ import ARKit
 class ViewController: UIViewController, ARSCNViewDelegate {
 
     var diceArray = [Die]()
+    var showGrid = true
     
+    @IBOutlet weak var showGridButton: UIBarButtonItem!
     @IBOutlet var sceneView: ARSCNView!
     
     override func viewDidLoad() {
@@ -24,30 +26,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Set the view's delegate
         sceneView.delegate = self
         
-        // Show statistics such as fps and timing information
-        //sceneView.showsStatistics = true
-        
-        //let object = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.01)
-//        let object = SCNSphere(radius: 0.2)
-//        let material = SCNMaterial()
-//        //material.diffuse.contents = UIColor.red
-//        material.diffuse.contents = UIImage(named: "art.scnassets/8k_moon.jpg")
-//        object.materials = [material]
-//
-//        let node = SCNNode()
-//        node.position = SCNVector3(x: 0, y: 0.1, z: -0.5)
-//        node.geometry = object
-//
-//        sceneView.scene.rootNode.addChildNode(node)
-        
         sceneView.autoenablesDefaultLighting = true
         
-        // Create a new scene
-        //let scene = SCNScene(named: "art.scnassets/ship.scn")!
-        // Set the scene to the view
-        //sceneView.scene = scene
-        
-
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -122,7 +102,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         rollAll()
     }
     
-    @IBAction func removeAllDice(_ sender: UIBarButtonItem) {
+    @IBAction func resetAll(_ sender: UIBarButtonItem) {
+        removeAllDice()
+    }
+    
+    
+    func removeAllDice(){
         if !diceArray.isEmpty {
             for die in diceArray {
                 die.removeFromParentNode()
@@ -131,47 +116,50 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
     }
     
+    @IBAction func hideShowGrid(_ sender: UIBarButtonItem) {
+        showGrid = !showGrid
+        showGridButton.image = UIImage(named: showGrid ? "glasses.png" : "sunglasses.png")
+        
+        for scnNode in self.sceneView.scene.rootNode.childNodes {
+            for childNode in scnNode.childNodes {
+                if let gridNode = childNode as? Grid {
+                    gridNode.opacity = showGrid ? 1 : 0
+//                    let fadeOut = SCNAction.customAction(duration: 5) { (node, elapsedTime) -> () in
+//                        node.opacity = 1 - elapsedTime / 5
+//                    }
+//
+//                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                        gridNode.runAction(fadeOut)
+//                    }
+                    
+                    
+                    //gridNode.visibility(isVisible: !gridNode.isVisible)
+                    //gridNode.visibility(isVisible: showGrid)
+                }
+            }
+        }
+    }
+    
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         guard let planeAnchor = anchor as? ARPlaneAnchor else {return}
-        let planeNode = createPlane(withPlaneAnchor: planeAnchor)
-        
-        node.addChildNode(planeNode)
+        let grid = Grid(withPlaneAnchor: planeAnchor)
+        gridNode.opacity = showGrid ? 1 : 0
+        node.addChildNode(grid)
     }
     
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
-        <#code#>
+        guard let planeAnchor = anchor as? ARPlaneAnchor else {return}
+        for childNode in node.childNodes {
+            if let gridNode = childNode as? Grid {
+                if gridNode.anchor.identifier == anchor.identifier {
+                    //if we have found the Grid created by this anchor update it
+                    gridNode.update(withAnchor: planeAnchor)
+                }
+            }
+        }
     }
     
     // MARK: - Plane rendering methods
-    
-    func createPlane(withPlaneAnchor planeAnchor: ARPlaneAnchor) -> SCNNode {
-        let plane = SCNPlane(width: CGFloat(planeAnchor.extent.x), height: CGFloat(planeAnchor.extent.z))
-        print("plane extent x: \(planeAnchor.extent.x) z: \(planeAnchor.extent.z)")
-        print("plane center x: \(planeAnchor.center.x) z: \(planeAnchor.center.z)")
-        
-        let planeNode = SCNNode()
-        
-        //rotate 90 degrees around x axis
-        if (planeAnchor.alignment == .horizontal) {
-            print("Horizontal plane dectected")
-            planeNode.position = SCNVector3(x: planeAnchor.center.x, y: 0, z: planeAnchor.center.z)
-            planeNode.transform = SCNMatrix4MakeRotation(-Float.pi/2, 1, 0, 0)
-        }
-        else {
-            print("Vertical plane dectected")
-            planeNode.position = SCNVector3(x: planeAnchor.center.x, y: 0, z: planeAnchor.center.z)
-            planeNode.transform = SCNMatrix4MakeRotation(-Float.pi/2, 1, 0, 0)
-        }
-        
-        let gridMaterial = SCNMaterial()
-        gridMaterial.diffuse.contents = UIImage(named: "art.scnassets/grid.png")
-        
-        plane.materials = [gridMaterial]
-        
-        planeNode.geometry = plane
-        
-        return planeNode
-    }
     
 /*
     // Override to create and configure nodes for anchors added to the view's session.

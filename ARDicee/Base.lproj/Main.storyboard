@@ -32,11 +32,18 @@
                         <viewLayoutGuide key="safeArea" id="fQZ-KI-GVf"/>
                     </view>
                     <navigationItem key="navigationItem" title="ARDicee" id="H14-VB-ke8">
-                        <barButtonItem key="leftBarButtonItem" systemItem="trash" id="mT2-pY-Vff">
-                            <connections>
-                                <action selector="removeAllDice:" destination="BV1-FR-VrT" id="5av-Mu-15Z"/>
-                            </connections>
-                        </barButtonItem>
+                        <leftBarButtonItems>
+                            <barButtonItem systemItem="trash" id="mT2-pY-Vff">
+                                <connections>
+                                    <action selector="resetAll:" destination="BV1-FR-VrT" id="5av-Mu-15Z"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Show Grid" image="glasses.png" id="Cy4-Bt-18c">
+                                <connections>
+                                    <action selector="hideShowGrid:" destination="BV1-FR-VrT" id="CGD-hA-zI3"/>
+                                </connections>
+                            </barButtonItem>
+                        </leftBarButtonItems>
                         <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="6dU-h8-jAS">
                             <connections>
                                 <action selector="rollAgain:" destination="BV1-FR-VrT" id="nsS-jx-n8R"/>
@@ -45,6 +52,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="sceneView" destination="BrB-h1-WRS" id="5nT-qQ-ynl"/>
+                        <outlet property="showGridButton" destination="Cy4-Bt-18c" id="w5g-aI-djL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
@@ -70,4 +78,7 @@
             <point key="canvasLocation" x="247" y="134"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="glasses.png" width="44" height="16"/>
+    </resources>
 </document>
