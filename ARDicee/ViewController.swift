@@ -143,7 +143,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         guard let planeAnchor = anchor as? ARPlaneAnchor else {return}
         let grid = Grid(withPlaneAnchor: planeAnchor)
-        gridNode.opacity = showGrid ? 1 : 0
+        grid.opacity = showGrid ? 1 : 0
         node.addChildNode(grid)
     }
     
